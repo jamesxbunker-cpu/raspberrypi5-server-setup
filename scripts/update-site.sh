@@ -1,3 +1,4 @@
+sudo tee /usr/local/bin/update-site.sh > /dev/null << 'EOF'
 #!/bin/bash
 
 SITE_PATH="/var/www/geosmin/Geosmin"
@@ -32,9 +33,13 @@ if [ ! -d "$SITE_PATH" ]; then
     exit 1
 fi
 
+# FORCE PERMISSIONS BEFORE ANY GIT OPERATIONS
+$SUDO $CHOWN -R $USER:$USER $SITE_PATH 2>/dev/null
+$SUDO $CHMOD -R 755 $SITE_PATH 2>/dev/null
+
 cd $SITE_PATH || exit 1
 
-# Force permissions before any git operations
+# Force git permissions
 $SUDO $CHOWN -R $USER:$USER .git 2>/dev/null
 $SUDO $CHMOD -R 755 .git 2>/dev/null
 
@@ -49,8 +54,13 @@ REMOTE_COMMIT=$($GIT rev-parse origin/$BRANCH 2>/dev/null)
 if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
     log_message "Changes detected! Pulling latest code..."
     
+    # Stash any local changes
     $GIT stash --include-untracked 2>&1 | tee -a $LOG_FILE
     log_message "Stashed local changes."
+    
+    # Reset to remote
+    $GIT reset --hard origin/$BRANCH 2>&1 | tee -a $LOG_FILE
+    log_message "Reset to remote."
     
     if $GIT pull origin $BRANCH 2>&1 | tee -a $LOG_FILE; then
         log_message "Pull successful."
@@ -69,3 +79,6 @@ fi
 
 log_message "Update check complete."
 log_message "========================================="
+EOF
+
+sudo chmod +x /usr/local/bin/update-site.sh
