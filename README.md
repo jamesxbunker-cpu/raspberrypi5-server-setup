@@ -16,3 +16,13 @@ This repository provides an automated solution for keeping your Raspberry Pi's w
 ```bash
 git clone https://github.com/jamesxbunker-cpu/raspberrypi5-server-setup.git
 cd raspberrypi5-server-setup
+
+### 2. Allow Permissions
+
+```bash
+chmod +x install.sh
+
+### 3. Run
+
+```bash
+sudo ./install.sh
