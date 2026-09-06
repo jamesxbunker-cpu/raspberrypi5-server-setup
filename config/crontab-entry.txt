@@ -1,0 +1,3 @@
+# Pi Website Updater Cron Job
+# Runs every 5 minutes
+*/5 * * * * /usr/local/bin/update-site.sh
